@@ -11,7 +11,7 @@
     --status-crit: #ef4444;
     
     --text-main: #ffffff;
-    /* ИСПРАВЛЕНИЕ ACCESSIBILITY: Более светлый серый для читаемости */
+    
     --text-muted: #a1a1aa; 
 }
 
@@ -113,30 +113,28 @@ body {
 .stat-val { font-size: 2rem; font-weight: 700; color: #fff; }
 .tabular { font-variant-numeric: tabular-nums; }
 
-/* Аварийный режим */
+
 body.critical-mode { background-image: radial-gradient(circle at 20% 50%, rgba(239, 68, 68, 0.15) 0%, transparent 60%); }
 body.critical-mode .widget:not(.alerts-widget):not(.chart-widget):not(.health-widget) { opacity: 0.5; filter: grayscale(50%); transition: all 0.3s ease; }
 body.critical-mode .alerts-widget { transform: scale(1.02); box-shadow: 0 0 30px rgba(239, 68, 68, 0.2); border: 1px solid var(--status-crit); z-index: 100; }
 body.critical-mode .header { border-bottom: 1px solid var(--status-crit); }
 
-/* Состояние обрыва связи */
+
 .offline-mode { filter: grayscale(100%) brightness(0.7); pointer-events: none; }
 
 
-/* =========================================
-   LIGHT MODE (СВЕТЛАЯ ТЕМА - PRO VERSION)
-   ========================================= */
+
 body.light-mode {
-    --bg-dark: #f3f4f6; /* Холодный светло-серый фон для объема */
-    --glass-bg: rgba(255, 255, 255, 0.85); /* Плотное матовое стекло */
-    --glass-border: rgba(0, 0, 0, 0.06); /* Очень тонкая граница */
-    --text-main: #111827; /* Глубокий темный (почти черный) */
-    --text-muted: #4b5563; /* Контрастный серый */
+    --bg-dark: #f3f4f6; 
+    --glass-bg: rgba(255, 255, 255, 0.85); 
+    --glass-border: rgba(0, 0, 0, 0.06);
+    --text-main: #111827; 
+    --text-muted: #4b5563; 
     
-    /* Сдвигаем акценты, чтобы они не терялись на белом фоне */
-    --status-norm: #059669; /* Глубокий изумрудный вместо неона */
-    --status-warn: #d97706; /* Плотный оранжевый/золотой */
-    --status-crit: #dc2626; /* Агрессивный кроваво-красный */
+    
+    --status-norm: #059669;
+    --status-warn: #d97706; 
+    --status-crit: #dc2626; 
     
     background-image: radial-gradient(circle at 50% 0%, rgba(0, 163, 224, 0.08) 0%, transparent 50%);
 }
@@ -148,12 +146,11 @@ body.light-mode .factor-header span:first-child,
 body.light-mode .header h1,
 body.light-mode .map-widget span { color: var(--text-main) !important; }
 
-/* 1. ГЛУБИНА (Depth) карточек */
+
 body.light-mode .glass-panel { 
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04); 
 }
 
-/* 2. ИНДЕКС ЗДОРОВЬЯ - ВОЗВРАЩАЕМ WOW-ЭФФЕКТ */
 body.light-mode .score-value {
     text-shadow: 0 4px 15px rgba(5, 150, 105, 0.25);
     font-weight: 800;
@@ -162,18 +159,18 @@ body.light-mode.critical-mode .score-value {
     text-shadow: 0 4px 15px rgba(220, 38, 38, 0.35);
 }
 
-/* 3. КНОПКИ И СХЕМА - ДЕЛАЕМ ОБЪЕМ */
+
 body.light-mode .outline-btn { background: rgba(255, 255, 255, 0.6); box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
 body.light-mode .action-btn { background: #e5e7eb; color: var(--text-main); font-weight: 600; }
 body.light-mode .action-btn:hover { background: #d1d5db; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 body.light-mode .train-schema { background: #ffffff; box-shadow: inset 0 2px 8px rgba(0,0,0,0.03); }
 
-/* Выпадающее меню */
+
 body.light-mode .dropdown-content { background: #ffffff; box-shadow: 0 10px 40px rgba(0,0,0,0.12); }
 body.light-mode .dropdown-content a { color: var(--text-main); }
 body.light-mode .dropdown-content a:hover { background: #f3f4f6; }
 
-/* 4. ВЫРАЗИТЕЛЬНЫЕ АЛЕРТЫ */
+
 body.light-mode .alert-card.critical {
     background: rgba(220, 38, 38, 0.08);
     border-left: 5px solid var(--status-crit);
@@ -186,7 +183,7 @@ body.light-mode.critical-mode {
 
 
 
-/* Стили для селекторов станций на карте */
+
 .glass-select {
     background: var(--glass-bg);
     color: var(--text-main);
@@ -206,7 +203,7 @@ body.light-mode .glass-select option {
     background: #fff;
     color: #000;
 }
-/* Инверсия цвета карты в темной теме для "ночного" режима */
+
 .leaflet-layer,
 .leaflet-control-zoom-in,
 .leaflet-control-zoom-out,
@@ -217,5 +214,5 @@ body.light-mode .leaflet-layer,
 body.light-mode .leaflet-control-zoom-in,
 body.light-mode .leaflet-control-zoom-out,
 body.light-mode .leaflet-control-attribution {
-    filter: none; /* Возвращаем нормальные цвета днем */
+    filter: none;
 }
