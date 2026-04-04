@@ -1,7 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // ==========================================
-    // 1. ИНИЦИАЛИЗАЦИЯ И БУФЕР ДАННЫХ (МАШИНА ВРЕМЕНИ)
-    // ==========================================
+  
     const chartDom = document.getElementById('main-chart');
     const myChart = echarts.init(chartDom);
     
@@ -46,9 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     myChart.setOption(getOption());
 
-    // ==========================================
-    // 2. ИНТЕРАКТИВНЫЕ УЗЛЫ И ФАКТОРЫ (ТОП-5)
-    // ==========================================
+   
     const factorsContainer = document.getElementById('factors-container');
     let activeCategory = null; 
     let isFailureMode = false;
@@ -127,9 +123,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // ==========================================
-    // 3. ПЛЕЕР МАШИНЫ ВРЕМЕНИ (REPLAY)
-    // ==========================================
     let isPaused = false;
     const playPauseBtn = document.getElementById('play-pause');
     const replayBtn = document.querySelector('.replay-controls .action-btn'); 
@@ -193,9 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateChartView();
     });
 
-    // ==========================================
-    // 4. ГЕНЕРАТОР ДАННЫХ (ФОНОВЫЙ ПОТОК)
-    // ==========================================
+  
     let updateIntervalId;
     let updateSpeed = 1000;
     let isOffline = false;
@@ -238,9 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     updateIntervalId = setInterval(fetchTelemetry, updateSpeed);
 
-    // ==========================================
-    // 5. КНОПКИ ДЕМО (АВАРИЯ, НАГРУЗКА И СЕТЬ)
-    // ==========================================
+   
     const highloadBtn = document.getElementById('highload-btn');
     highloadBtn.addEventListener('click', () => {
         clearInterval(updateIntervalId);
@@ -252,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateIntervalId = setInterval(fetchTelemetry, updateSpeed);
     });
 
-    // --- ИСПРАВЛЕННАЯ КНОПКА СИМУЛЯЦИИ (С ВОЗВРАТОМ И КНОПКАМИ В АЛЕРТЕ) ---
+  
     const failureBtn = document.getElementById('simulate-failure-btn');
     failureBtn.addEventListener('click', () => {
         isFailureMode = !isFailureMode; // Переключатель туда-сюда
@@ -260,7 +249,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const alertBox = document.getElementById('dynamic-alert');
 
         if (isFailureMode) {
-            // 🔴 ВКЛЮЧАЕМ АВАРИЮ
             document.body.classList.add('critical-mode');
             
             document.getElementById('health-score').innerText = '64';
@@ -279,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 label: { show: true, position: 'top', backgroundColor: '#ef4444', color: '#fff', padding: [4, 8], borderRadius: 4, fontWeight: 'bold' }
             };
 
-            // Добавляем кнопки действий обратно в алерт!
+          
             alertBox.className = 'alert-card critical';
             alertBox.innerHTML = `
                 <span class="alert-icon">🚨</span>
@@ -293,13 +281,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             
-            // Меняем саму кнопку демо на "Восстановить"
+           
             failureBtn.innerHTML = '✅ Restore System'; 
             failureBtn.style.borderColor = 'var(--status-norm)';
             failureBtn.style.color = 'var(--status-norm)';
 
         } else {
-            // 🟢 ВОЗВРАЩАЕМ В ШТАТНЫЙ РЕЖИМ (ПОЧИНИЛИ)
+            
             document.body.classList.remove('critical-mode');
             
             document.getElementById('health-score').innerText = '98';
@@ -311,9 +299,9 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('node-engine').className = 'schema-node status-norm';
             document.getElementById('node-engine').innerText = '⚙️ Двигатель';
 
-            window.chartAnomalyMarker = null; // Убираем маркер с графика
+            window.chartAnomalyMarker = null; 
 
-            // Возвращаем обычный алерт
+          
             alertBox.className = 'alert-card norm-state';
             alertBox.innerHTML = `
                 <span class="alert-icon">✅</span>
@@ -323,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             
-            // Возвращаем демо-кнопку в исходное состояние
+           
             failureBtn.innerHTML = '🔥 Simulate Failure'; 
             failureBtn.style.borderColor = 'var(--status-crit)';
             failureBtn.style.color = 'var(--status-crit)';
@@ -331,9 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    // ==========================================
-    // 6. ЭКСПОРТ (PDF / CSV)
-    // ==========================================
+    
     const exportDropdownBtn = document.getElementById('export-dropdown-btn');
     const exportCsvBtn = document.getElementById('export-csv');
     const exportPdfBtn = document.getElementById('export-pdf');
@@ -400,9 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showExportSuccess();
     });
 
-    // ==========================================
-    // 7. СВЕТЛАЯ/ТЕМНАЯ ТЕМА (LOCAL STORAGE)
-    // ==========================================
+    
     const themeToggleBtn = document.getElementById('theme-toggle-btn');
     
     function applyChartTheme() {
@@ -438,9 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
         applyChartTheme();
     });
 
-    // ==========================================
-    // 8. ИНТЕРАКТИВНАЯ КАРТА (LEAFLET) И ВКЛАДКИ
-    // ==========================================
+   
     const tabTrends = document.getElementById('tab-trends');
     const tabMap = document.getElementById('tab-map');
     const chartContainer = document.getElementById('main-chart');
