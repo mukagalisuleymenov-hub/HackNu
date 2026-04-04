@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KTZ Loco-Twin | Цифровой двойник</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <header class="glass-panel header">
+        <div class="logo-area">
+            <img src="logo.png" alt="Логотип КТЖ" class="header-logo" style="height: 45px; border-radius: 4px;">
+            <h1>Loco-Twin Dashboard</h1>
+        </div>
+        <div class="controls">
+            <button id="theme-toggle-btn" class="btn action-btn" style="border: 1px solid var(--glass-border);">☀️ Light</button>
+            <div class="network-status" id="network-toggle" style="cursor: pointer; padding: 5px 10px; border-radius: 4px; transition: background 0.3s;">
+                <span class="ping online" id="ping-indicator">🟢 12ms</span>
+                <span class="last-sync" id="sync-indicator" style="font-size: 0.85rem; color: var(--text-muted); margin-right: 5px;">Sync: 0.1s ago</span>
+            </div>
+            
+            <button id="highload-btn" class="btn outline-btn" style="border-color: var(--ktz-blue); color: var(--ktz-blue);">🚀 x10 Load</button>
+            <button id="simulate-failure-btn" class="btn outline-btn" style="border-color: var(--status-crit); color: var(--status-crit);">🔥 Simulate Failure</button>
+            
+            <div class="dropdown">
+                <button id="export-dropdown-btn" class="btn primary-btn">Export Report ▾</button>
+                <div class="dropdown-content">
+                    <a href="#" id="export-csv">📄 Скачать CSV (Сырые данные)</a>
+                    <a href="#" id="export-pdf">📊 Скачать PDF (Отчет)</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-grid">
+        
+        <div class="column left-col">
+            <section class="glass-panel widget health-widget">
+                <h2>Индекс здоровья системы</h2>
+                <div class="health-score-container">
+                    <div id="health-score" class="score-value">98</div>
+                    <span class="score-max">/ 100</span>
+                </div>
+                <div id="health-status" class="health-status norm" style="margin-bottom: 20px; font-weight: 600;">
+                    Состояние: СТАБИЛЬНО <span style="color:var(--text-muted); font-weight:normal;">(Риск: Минимальный)</span>
+                </div>
+                
+                <div class="train-schema">
+                    <div class="schema-node status-norm" id="node-power">🔋 Питание</div>
+                    <div class="schema-line"></div>
+                    <div class="schema-node status-norm" id="node-engine">⚙️ Двигатель</div>
+                    <div class="schema-line"></div>
+                    <div class="schema-node status-norm" id="node-brakes">🛑 Тормоза</div>
+                </div>
+                
+                <div class="health-breakdown" style="margin-top: 25px;" id="factors-container">
+                    </div>
+            </section>
+
+            <section class="glass-panel widget alerts-widget" id="main-alert-panel">
+                <h2>Система предупреждений</h2>
+                <div id="alerts-container" class="alerts-list">
+                    <div class="alert-card norm-state" id="dynamic-alert">
+                        <span class="alert-icon">✅</span>
+                        <div class="alert-content">
+                            <strong style="font-size: 1.05rem; color: #fff;">ОТКЛОНЕНИЙ НЕ ВЫЯВЛЕНО</strong>
+                            <p style="color: var(--text-muted); margin-top: 4px;">Все системы работают в штатном режиме. Показатели в пределах нормы.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+       <div class="column right-col">
+            
+            <section class="glass-panel widget chart-widget">
+                <div class="widget-header" style="border-bottom: 1px solid var(--glass-border); padding-bottom: 15px; margin-bottom: 15px;">
+                    <div class="tabs-toggle" style="display: flex; gap: 10px;">
+                        <button id="tab-trends" class="btn primary-btn">📈 Тренды</button>
+                        <button id="tab-map" class="btn outline-btn" style="color: var(--text-main); border-color: var(--glass-border);">🗺️ Карта маршрута</button>
+                    </div>
+                    <div class="live-indicator" id="chart-live-badge">LIVE</div>
+                </div>
+
+                <div id="map-controls" style="display: none; gap: 15px; align-items: center; margin-bottom: 15px; background: rgba(0,0,0,0.1); padding: 10px; border-radius: 8px;">
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">Маршрут:</span>
+                    <select id="station-a" class="glass-select">
+                        <option value="astana">Астана (Нурлы Жол)</option>
+                        <option value="almaty">Алматы</option>
+                    </select>
+                    <span style="color: var(--ktz-blue);">➡</span>
+                    <select id="station-b" class="glass-select">
+                        <option value="karaganda" selected>Караганда</option>
+                        <option value="pavlodar">Павлодар</option>
+                    </select>
+                    <span style="margin-left: auto; font-size: 0.8rem; color: var(--status-norm);">GPS Signal: OK</span>
+                </div>
+
+                <div id="content-area" style="position: relative;">
+                    <div id="main-chart" style="width: 100%; height: 300px;"></div>
+                    <div id="map-container" style="width: 100%; height: 300px; display: none; border-radius: 8px; z-index: 1;"></div>
+                </div>
+                
+                <div class="replay-controls" id="replay-panel" style="display:flex; gap:15px; align-items:center; margin-top:10px; padding-top:15px; border-top:1px solid var(--glass-border);">
+                    <button class="action-btn">⏪ -5m</button>
+                    <button class="action-btn" id="play-pause">⏸ Pause</button>
+                    <input type="range" min="0" max="100" value="100" class="timeline-slider" style="flex-grow:1; cursor:pointer;">
+                    <span class="time-label" id="timeline-status" style="font-size:0.9rem; color:var(--status-norm); font-weight:700;">LIVE</span>
+                </div>
+            </section>
+
+            <section class="quick-stats-grid">
+                <div class="glass-panel stat-card">
+                    <span class="stat-label">Давление ТМ</span>
+                    <span class="stat-val tabular" id="pressure-val">5.2 <small style="color:var(--text-muted); font-size:1rem;">кгс/см²</small></span>
+                </div>
+                <div class="glass-panel stat-card">
+                    <span class="stat-label">Напряжение сети</span>
+                    <span class="stat-val tabular" id="voltage-val">25.4 <small style="color:var(--text-muted); font-size:1rem;">кВ</small></span>
+                </div>
+               <div class="glass-panel stat-card">
+                    <span class="stat-label">Остаток топлива</span>
+                    <span class="stat-val tabular" id="fuel-val">4200 <small style="color:var(--text-muted); font-size:1rem;">л</small></span>
+                    <span class="stat-context alert-text" style="font-size:0.85rem; margin-top:5px; color: var(--text-muted);">
+                        ↓ Расход: <strong style="color:var(--text-main);">120 л/ч</strong><br>
+                        ⏱ Остаток: <strong style="color:var(--ktz-blue);">~35 ч.</strong>
+                    </span>
+                </div>
+            </section>
+            
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
