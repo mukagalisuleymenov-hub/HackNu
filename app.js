@@ -252,57 +252,84 @@ document.addEventListener('DOMContentLoaded', () => {
         updateIntervalId = setInterval(fetchTelemetry, updateSpeed);
     });
 
+    // --- ИСПРАВЛЕННАЯ КНОПКА СИМУЛЯЦИИ (С ВОЗВРАТОМ И КНОПКАМИ В АЛЕРТЕ) ---
     const failureBtn = document.getElementById('simulate-failure-btn');
     failureBtn.addEventListener('click', () => {
-        isFailureMode = true;
-        document.body.classList.add('critical-mode');
+        isFailureMode = !isFailureMode; // Переключатель туда-сюда
         
-        document.getElementById('health-score').innerText = '64';
-        document.getElementById('health-score').style.color = 'var(--status-crit)';
-        document.getElementById('health-status').innerHTML = 'Состояние: КРИТИЧНО <span style="color:var(--status-crit); font-weight:bold;">(Риск: ВЫСОКИЙ)</span>';
-        
-        renderFactors(criticalFactors);
-
-        document.getElementById('node-engine').className = 'schema-node status-crit';
-        document.getElementById('node-engine').innerText = '🔥 Двигатель (Отказ)';
-
-        window.chartAnomalyMarker = { 
-            coord: [fullTime[fullTime.length - 1], fullTemp[fullTemp.length - 1]], 
-            value: 'OVERHEAT', 
-            itemStyle: { color: '#ef4444' },
-            label: { show: true, position: 'top', backgroundColor: '#ef4444', color: '#fff', padding: [4, 8], borderRadius: 4, fontWeight: 'bold' }
-        };
-
         const alertBox = document.getElementById('dynamic-alert');
-        alertBox.className = 'alert-card critical';
-        alertBox.innerHTML = `
-            <span class="alert-icon">🚨</span>
-            <div class="alert-content">
-                <strong style="color: var(--status-crit); font-size: 1.1rem; text-transform: uppercase;">Критический перегрев ТЭД-1</strong>
-                <p style="color: var(--text-main); margin: 8px 0; font-size: 0.9rem;">Температура превысила 105°C. Прогноз: возгорание через 4 мин.</p>
-            </div>
-        `;
-        failureBtn.innerText = 'System Failed'; failureBtn.disabled = true;
-    });
 
-    const networkToggle = document.getElementById('network-toggle');
-    networkToggle.addEventListener('click', () => {
-        isOffline = !isOffline;
-        const ping = document.getElementById('ping-indicator'); const sync = document.getElementById('sync-indicator');
-        
-        if (isOffline) {
-            ping.innerText = "🔴 Disconnected"; ping.style.color = "var(--status-crit)";
-            sync.innerText = "Connection lost..."; networkToggle.style.background = "rgba(239, 68, 68, 0.1)";
-            document.querySelector('.dashboard-grid').classList.add('offline-mode');
+        if (isFailureMode) {
+            // 🔴 ВКЛЮЧАЕМ АВАРИЮ
+            document.body.classList.add('critical-mode');
+            
+            document.getElementById('health-score').innerText = '64';
+            document.getElementById('health-score').style.color = 'var(--status-crit)';
+            document.getElementById('health-status').innerHTML = 'Состояние: КРИТИЧНО <span style="color:var(--status-crit); font-weight:bold;">(Риск: ВЫСОКИЙ)</span>';
+            
+            renderFactors(criticalFactors);
+
+            document.getElementById('node-engine').className = 'schema-node status-crit';
+            document.getElementById('node-engine').innerText = '🔥 Двигатель (Отказ)';
+
+            window.chartAnomalyMarker = { 
+                coord: [fullTime[fullTime.length - 1], fullTemp[fullTemp.length - 1]], 
+                value: 'OVERHEAT', 
+                itemStyle: { color: '#ef4444' },
+                label: { show: true, position: 'top', backgroundColor: '#ef4444', color: '#fff', padding: [4, 8], borderRadius: 4, fontWeight: 'bold' }
+            };
+
+            // Добавляем кнопки действий обратно в алерт!
+            alertBox.className = 'alert-card critical';
+            alertBox.innerHTML = `
+                <span class="alert-icon">🚨</span>
+                <div class="alert-content" style="flex-grow: 1;">
+                    <strong style="color: var(--status-crit); font-size: 1.1rem; text-transform: uppercase;">Критический перегрев ТЭД-1</strong>
+                    <p style="color: var(--text-main); margin: 6px 0 12px 0; font-size: 0.9rem;">Температура превысила 105°C. Прогноз: возгорание через 4 мин.</p>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn primary-btn" style="background:var(--status-crit); padding: 6px 12px; font-size: 0.85rem;">🛑 Экстренное торможение</button>
+                        <button class="btn action-btn" style="padding: 6px 12px; font-size: 0.85rem; border: 1px solid var(--glass-border);">📞 Связь с машинистом</button>
+                    </div>
+                </div>
+            `;
+            
+            // Меняем саму кнопку демо на "Восстановить"
+            failureBtn.innerHTML = '✅ Restore System'; 
+            failureBtn.style.borderColor = 'var(--status-norm)';
+            failureBtn.style.color = 'var(--status-norm)';
+
         } else {
-            ping.innerText = "🟡 Reconnecting..."; ping.style.color = "var(--status-warn)";
-            setTimeout(() => {
-                ping.innerText = "🟢 12ms"; ping.style.color = "var(--status-norm)";
-                sync.innerText = "Sync: 0.1s ago"; networkToggle.style.background = "transparent";
-                document.querySelector('.dashboard-grid').classList.remove('offline-mode');
-            }, 1500);
+            // 🟢 ВОЗВРАЩАЕМ В ШТАТНЫЙ РЕЖИМ (ПОЧИНИЛИ)
+            document.body.classList.remove('critical-mode');
+            
+            document.getElementById('health-score').innerText = '98';
+            document.getElementById('health-score').style.color = 'var(--status-norm)';
+            document.getElementById('health-status').innerHTML = 'Состояние: СТАБИЛЬНО <span style="color:var(--text-muted); font-weight:normal;">(Риск: Минимальный)</span>';
+            
+            renderFactors(defaultFactors);
+
+            document.getElementById('node-engine').className = 'schema-node status-norm';
+            document.getElementById('node-engine').innerText = '⚙️ Двигатель';
+
+            window.chartAnomalyMarker = null; // Убираем маркер с графика
+
+            // Возвращаем обычный алерт
+            alertBox.className = 'alert-card norm-state';
+            alertBox.innerHTML = `
+                <span class="alert-icon">✅</span>
+                <div class="alert-content">
+                    <strong style="font-size: 1.05rem; color: var(--text-main);">ОТКЛОНЕНИЙ НЕ ВЫЯВЛЕНО</strong>
+                    <p style="color: var(--text-muted); margin-top: 4px;">Все системы работают в штатном режиме. Показатели в пределах нормы.</p>
+                </div>
+            `;
+            
+            // Возвращаем демо-кнопку в исходное состояние
+            failureBtn.innerHTML = '🔥 Simulate Failure'; 
+            failureBtn.style.borderColor = 'var(--status-crit)';
+            failureBtn.style.color = 'var(--status-crit)';
         }
     });
+
 
     // ==========================================
     // 6. ЭКСПОРТ (PDF / CSV)
