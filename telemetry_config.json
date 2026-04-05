@@ -1,0 +1,361 @@
+{
+  "locomotives": {
+    "KZ8A": {
+      "type": "electric",
+      "description": "Двухсекционный грузовой электровоз переменного тока, Alstom Prima",
+      "manufacturer": "Alstom / ЭКЗ (Астана)",
+      "specs": {
+        "power_kw": 8800,
+        "max_speed_kmh": 120,
+        "mass_tonnes": 200,
+        "axle_formula": "2×(2o-2o)",
+        "voltage_kv": 25,
+        "frequency_hz": 50,
+        "traction_motors": 8,
+        "motor_power_kw": 1100,
+        "max_tractive_force_kn": 833,
+        "max_braking_force_kn": 500,
+        "regen_braking_kw": 7600,
+        "operating_temp_range_c": [-50, 50],
+        "gauge_mm": 1520
+      }
+    },
+    "TE33A": {
+      "type": "diesel",
+      "description": "Односекционный грузовой тепловоз с электрической передачей, GE Evolution",
+      "manufacturer": "GE Transportation / Локомотив құрастыру зауыты (Астана)",
+      "specs": {
+        "engine": "GEVO-12",
+        "engine_power_hp": 4575,
+        "engine_power_kw": 3360,
+        "max_speed_kmh": 120,
+        "mass_tonnes": 138,
+        "axle_formula": "3o-3o",
+        "traction_motors": 6,
+        "motor_power_kw": 560,
+        "operating_temp_range_c": [-50, 50],
+        "gauge_mm": 1520
+      }
+    }
+  },
+
+  "telemetry_parameters": {
+    "common": {
+      "speed": {
+        "unit": "km/h",
+        "min": 0,
+        "max": 120,
+        "normal_range": [0, 100],
+        "warning": 110,
+        "critical": 120,
+        "resolution": 0.1,
+        "description": "Скорость движения"
+      },
+      "brake_pipe_pressure": {
+        "unit": "kPa",
+        "min": 0,
+        "max": 600,
+        "normal_range": [480, 540],
+        "warning_low": 450,
+        "critical_low": 310,
+        "description": "Давление в тормозной магистрали"
+      },
+      "brake_cylinder_pressure": {
+        "unit": "kPa",
+        "min": 0,
+        "max": 400,
+        "normal_range": [0, 380],
+        "description": "Давление в тормозных цилиндрах"
+      },
+      "main_reservoir_pressure": {
+        "unit": "kPa",
+        "min": 0,
+        "max": 1000,
+        "normal_range": [750, 900],
+        "warning_low": 600,
+        "critical_low": 413,
+        "description": "Давление в главных резервуарах"
+      },
+      "ambient_temperature": {
+        "unit": "°C",
+        "min": -50,
+        "max": 50,
+        "normal_range": [-40, 40],
+        "description": "Температура наружного воздуха"
+      },
+      "traction_motor_temperature": {
+        "unit": "°C",
+        "min": -50,
+        "max": 200,
+        "normal_range": [20, 140],
+        "warning": 155,
+        "critical": 180,
+        "description": "Температура тяговых электродвигателей (макс. из всех)"
+      },
+      "traction_motor_current": {
+        "unit": "A",
+        "min": 0,
+        "max": 1200,
+        "normal_range": [0, 1000],
+        "warning": 1050,
+        "critical": 1150,
+        "description": "Ток тяговых двигателей"
+      },
+      "tractive_effort": {
+        "unit": "kN",
+        "min": 0,
+        "max": 833,
+        "normal_range": [0, 700],
+        "description": "Сила тяги"
+      },
+      "latitude": {
+        "unit": "deg",
+        "min": 40.0,
+        "max": 55.0,
+        "description": "GPS широта"
+      },
+      "longitude": {
+        "unit": "deg",
+        "min": 50.0,
+        "max": 80.0,
+        "description": "GPS долгота"
+      }
+    },
+
+    "electric_only": {
+      "catenary_voltage": {
+        "unit": "kV",
+        "min": 0,
+        "max": 29,
+        "normal_range": [21, 27.5],
+        "warning_low": 19,
+        "warning_high": 28,
+        "critical_low": 17,
+        "critical_high": 29,
+        "description": "Напряжение контактной сети"
+      },
+      "dc_bus_voltage": {
+        "unit": "V",
+        "min": 0,
+        "max": 2200,
+        "normal_range": [1600, 1900],
+        "warning_high": 2000,
+        "critical_high": 2100,
+        "description": "Напряжение шины постоянного тока (IGBT преобразователь)"
+      },
+      "pantograph_status": {
+        "unit": "enum",
+        "values": ["raised", "lowered", "fault"],
+        "normal": "raised",
+        "description": "Состояние токоприёмника"
+      },
+      "transformer_oil_temperature": {
+        "unit": "°C",
+        "min": -50,
+        "max": 120,
+        "normal_range": [30, 85],
+        "warning": 95,
+        "critical": 105,
+        "description": "Температура масла трансформатора"
+      },
+      "traction_converter_temperature": {
+        "unit": "°C",
+        "min": -50,
+        "max": 100,
+        "normal_range": [20, 70],
+        "warning": 80,
+        "critical": 90,
+        "description": "Температура тягового преобразователя (IGBT)"
+      },
+      "regen_braking_power": {
+        "unit": "kW",
+        "min": 0,
+        "max": 7600,
+        "normal_range": [0, 6000],
+        "description": "Мощность рекуперативного торможения"
+      },
+      "total_power_consumption": {
+        "unit": "kW",
+        "min": 0,
+        "max": 8800,
+        "normal_range": [0, 8000],
+        "description": "Общая потребляемая мощность"
+      },
+      "section_coupling_status": {
+        "unit": "enum",
+        "values": ["connected", "disconnected", "fault"],
+        "normal": "connected",
+        "description": "Связь между секциями (система многих единиц)"
+      }
+    },
+
+    "diesel_only": {
+      "engine_rpm": {
+        "unit": "rpm",
+        "min": 0,
+        "max": 1050,
+        "idle": 450,
+        "normal_range": [450, 1050],
+        "description": "Обороты дизеля GEVO-12 (Idle=450, Full=1050)"
+      },
+      "engine_coolant_temperature": {
+        "unit": "°C",
+        "min": -50,
+        "max": 110,
+        "normal_range": [75, 95],
+        "warning": 100,
+        "critical": 105,
+        "description": "Температура охлаждающей жидкости двигателя"
+      },
+      "engine_oil_pressure": {
+        "unit": "kPa",
+        "min": 0,
+        "max": 700,
+        "normal_range": [280, 550],
+        "warning_low": 200,
+        "critical_low": 140,
+        "description": "Давление масла двигателя"
+      },
+      "engine_oil_temperature": {
+        "unit": "°C",
+        "min": -50,
+        "max": 130,
+        "normal_range": [70, 100],
+        "warning": 110,
+        "critical": 120,
+        "description": "Температура масла двигателя"
+      },
+      "turbo_boost_pressure": {
+        "unit": "kPa",
+        "min": 0,
+        "max": 350,
+        "normal_range": [100, 280],
+        "description": "Давление наддува турбокомпрессора"
+      },
+      "exhaust_temperature": {
+        "unit": "°C",
+        "min": 50,
+        "max": 700,
+        "normal_range": [200, 550],
+        "warning": 600,
+        "critical": 650,
+        "description": "Температура выхлопных газов"
+      },
+      "fuel_level": {
+        "unit": "%",
+        "min": 0,
+        "max": 100,
+        "normal_range": [20, 100],
+        "warning_low": 15,
+        "critical_low": 5,
+        "description": "Уровень топлива"
+      },
+      "fuel_consumption_rate": {
+        "unit": "L/h",
+        "min": 0,
+        "max": 600,
+        "idle_rate": 15,
+        "full_load_rate": 500,
+        "description": "Расход топлива"
+      },
+      "throttle_position": {
+        "unit": "notch",
+        "min": 0,
+        "max": 8,
+        "values": [0, 1, 2, 3, 4, 5, 6, 7, 8],
+        "description": "Позиция контроллера (0=Idle, 8=Full)"
+      },
+      "engine_status": {
+        "unit": "enum",
+        "values": ["running", "idle", "starting", "shutdown", "fault"],
+        "normal": "running",
+        "description": "Состояние дизельного двигателя"
+      }
+    }
+  },
+
+  "alert_codes": {
+    "E001": { "severity": "critical", "message": "Перегрев ТЭД", "param": "traction_motor_temperature" },
+    "E002": { "severity": "critical", "message": "Падение давления тормозной магистрали", "param": "brake_pipe_pressure" },
+    "E003": { "severity": "warning",  "message": "Повышенная температура трансформатора", "param": "transformer_oil_temperature" },
+    "E004": { "severity": "critical", "message": "Потеря напряжения контактной сети", "param": "catenary_voltage" },
+    "E005": { "severity": "warning",  "message": "Низкое давление главных резервуаров", "param": "main_reservoir_pressure" },
+    "E006": { "severity": "critical", "message": "Перегрев дизеля", "param": "engine_coolant_temperature" },
+    "E007": { "severity": "warning",  "message": "Низкое давление масла", "param": "engine_oil_pressure" },
+    "E008": { "severity": "warning",  "message": "Низкий уровень топлива", "param": "fuel_level" },
+    "E009": { "severity": "critical", "message": "Превышение скорости", "param": "speed" },
+    "E010": { "severity": "warning",  "message": "Перегрев тягового преобразователя", "param": "traction_converter_temperature" },
+    "E011": { "severity": "critical", "message": "Неисправность токоприёмника", "param": "pantograph_status" },
+    "E012": { "severity": "warning",  "message": "Повышенная температура выхлопа", "param": "exhaust_temperature" }
+  },
+
+  "health_index": {
+    "formula": "H = 100 - Σ(w_i × penalty_i(x_i))",
+    "categories": {
+      "A": { "range": [90, 100], "label": "Норма", "color": "#22c55e" },
+      "B": { "range": [70, 89],  "label": "Хорошо", "color": "#84cc16" },
+      "C": { "range": [50, 69],  "label": "Внимание", "color": "#eab308" },
+      "D": { "range": [25, 49],  "label": "Предупреждение", "color": "#f97316" },
+      "E": { "range": [0, 24],   "label": "Критично", "color": "#ef4444" }
+    },
+    "weights": {
+      "brake_system": 0.25,
+      "traction_motors": 0.20,
+      "power_system": 0.20,
+      "engine_thermal": 0.15,
+      "speed_compliance": 0.10,
+      "fuel_energy": 0.10
+    },
+    "penalty_function": "0 if in normal_range, linear scale to 1.0 at critical threshold"
+  },
+
+  "websocket_message_format": {
+    "type": "telemetry",
+    "timestamp": "2026-04-04T12:00:00.000Z",
+    "locomotive_id": "KZ8A-0042",
+    "locomotive_type": "KZ8A",
+    "data": {
+      "speed": 85.3,
+      "brake_pipe_pressure": 510,
+      "traction_motor_temperature": 95,
+      "catenary_voltage": 25.1,
+      "tractive_effort": 450
+    },
+    "alerts": [],
+    "health_index": 92,
+    "health_category": "A"
+  },
+
+  "simulation_scenarios": {
+    "normal_operation": {
+      "description": "Нормальная эксплуатация на перегоне",
+      "duration_min": 30,
+      "speed_profile": "accelerate to 80-100, cruise, decelerate"
+    },
+    "heavy_load": {
+      "description": "Тяжёлый состав 9000 тонн, подъём",
+      "duration_min": 15,
+      "speed_profile": "40-60 km/h, high traction, elevated motor temps"
+    },
+    "emergency_braking": {
+      "description": "Экстренное торможение",
+      "duration_min": 2,
+      "speed_profile": "rapid deceleration, brake pressure spike"
+    },
+    "overheat_scenario": {
+      "description": "Постепенный перегрев ТЭД",
+      "duration_min": 10,
+      "speed_profile": "motor temp climbing to warning then critical"
+    },
+    "power_loss": {
+      "description": "Потеря напряжения контактной сети (KZ8A)",
+      "duration_min": 3,
+      "speed_profile": "voltage drops, power cut, coasting"
+    },
+    "fuel_depletion": {
+      "description": "Расход топлива до критического уровня (TE33A)",
+      "duration_min": 20,
+      "speed_profile": "fuel level steadily decreasing"
+    }
+  }
+}

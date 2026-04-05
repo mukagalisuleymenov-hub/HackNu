@@ -1,0 +1,47 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend-Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./config:/app/config
+      - backend-data:/app/data
+    environment:
+      - AUTH_USER=${AUTH_USER:-admin}
+      - AUTH_PASS=${AUTH_PASS:-admin}
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+
+  simulator:
+    build:
+      context: .
+      dockerfile: simulator-Dockerfile
+    environment:
+      - LOCO_TYPE=${LOCO_TYPE:-KZ8A}
+      - SPEED=${SPEED:-1}
+    command: >
+      python -u simulator.py
+      --type ${LOCO_TYPE:-KZ8A}
+      --url ws://backend:8000/ws/ingest
+      --speed ${SPEED:-1}
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  backend-data:
