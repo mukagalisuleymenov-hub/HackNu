@@ -1,147 +1,321 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>КТЖ — Цифровой двойник</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- ─── HEADER ─── -->
+    <header class="header">
+      <div class="header-left">
+        <div class="logo">
+          <img
+            src="logo.png"
+            alt="КТЖ"
+            class="logo-img"
+            onerror="this.style.display = 'none'"
+          />
+          <span class="logo-text">КТЖ</span>
+          <span class="logo-divider"></span>
+          <span class="logo-sub">Цифровой двойник</span>
+        </div>
+        <div class="loco-badge">
+          <span id="loco-id">—</span>
+          <span class="loco-sep">·</span>
+          <span id="loco-type">—</span>
+        </div>
+      </div>
 
-    <header class="glass-panel header">
-        <div class="logo-area">
-            <img src="logo.png" alt="Логотип КТЖ" class="header-logo" style="height:45px;border-radius:4px;">
-            <h1>КТЖ</h1>
+      <div class="header-right">
+        <div class="conn-status" title="Состояние подключения">
+          <span class="conn-dot offline" id="conn-dot"></span>
+          <span id="conn-text">Подключение...</span>
+          <span id="conn-latency" class="conn-latency"></span>
         </div>
 
-        <!-- Fixed-width loco info — JS updates textContent only -->
-        <div id="loco-label">— Ожидание данных —</div>
-
-        <div class="controls">
-            <button id="theme-toggle-btn" class="btn action-btn" style="border:1px solid var(--glass-border);">☀️ Light</button>
-            <div class="network-status" style="padding:5px 10px;border-radius:4px;">
-                <span id="ping-indicator" style="margin-right:6px;">🟡 Connecting</span>
-                <span id="sync-indicator" style="font-size:0.85rem;color:var(--text-muted);"></span>
+        <div class="header-actions">
+          <button id="theme-toggle-btn" class="icon-btn" title="Тема">
+            ☀️
+          </button>
+          <button
+            id="highload-btn"
+            class="chip-btn"
+            title="Имитация нагрузки ×10"
+          >
+            🚀 x10
+          </button>
+          <button
+            id="simulate-failure-btn"
+            class="chip-btn chip-danger"
+            title="Имитация отказа"
+          >
+            🔥 Авария
+          </button>
+          <div class="dropdown">
+            <button id="export-dropdown-btn" class="chip-btn chip-primary">
+              📥 Экспорт ▾
+            </button>
+            <div class="dropdown-content">
+              <a href="#" id="export-csv">📄 CSV — сырые данные</a>
+              <a href="#" id="export-pdf">📊 PDF — отчёт</a>
             </div>
-            <button id="highload-btn" class="btn outline-btn" style="border-color:var(--ktz-blue);color:var(--ktz-blue);">🚀 x10 Load</button>
-            <button id="simulate-failure-btn" class="btn outline-btn" style="border-color:var(--status-crit);color:var(--status-crit);">🔥 Simulate Failure</button>
-            <div class="dropdown">
-                <button id="export-dropdown-btn" class="btn primary-btn">Export Report ▾</button>
-                <div class="dropdown-content">
-                    <a href="#" id="export-csv">📄 Скачать CSV (Сырые данные)</a>
-                    <a href="#" id="export-pdf">📊 Скачать PDF (Отчет)</a>
-                </div>
-            </div>
+          </div>
         </div>
+      </div>
     </header>
 
-    <!-- History mode banner -->
-    <div id="history-banner">
-        <span>⏪ <strong>Режим истории</strong> — живые обновления приостановлены.</span>
-        <button onclick="jumpToLive()" class="btn primary-btn" style="padding:4px 14px;font-size:0.82rem;white-space:nowrap;">▶ Вернуться к LIVE</button>
+    <!-- ─── HISTORY BANNER ─── -->
+    <div id="history-banner" class="history-banner">
+      <span
+        >⏪ <strong>Режим истории</strong> — живые обновления
+        приостановлены</span
+      >
+      <button onclick="jumpToLive()" class="chip-btn chip-primary">
+        ▶ К LIVE
+      </button>
     </div>
 
-    <main class="dashboard-grid">
+    <!-- ─── MAIN GRID ─── -->
+    <main class="dashboard">
+      <!-- LEFT COLUMN -->
+      <aside class="col-left">
+        <!-- Health Index -->
+        <section class="card health-card">
+          <h2 class="card-title">Индекс здоровья</h2>
+          <div class="health-ring-wrap">
+            <svg class="health-ring" viewBox="0 0 120 120">
+              <circle
+                cx="60"
+                cy="60"
+                r="54"
+                fill="none"
+                stroke="var(--ring-track)"
+                stroke-width="8"
+              />
+              <circle
+                id="health-ring-fill"
+                cx="60"
+                cy="60"
+                r="54"
+                fill="none"
+                stroke="var(--status-norm)"
+                stroke-width="8"
+                stroke-linecap="round"
+                stroke-dasharray="339.29"
+                stroke-dashoffset="339.29"
+                transform="rotate(-90 60 60)"
+                style="
+                  transition:
+                    stroke-dashoffset 0.6s ease,
+                    stroke 0.4s ease;
+                "
+              />
+            </svg>
+            <div class="health-ring-center">
+              <span id="health-score" class="health-num">—</span>
+            </div>
+          </div>
+          <div id="health-label" class="health-label">Ожидание данных...</div>
 
-        <div class="column left-col">
-            <section class="glass-panel widget health-widget">
-                <h2>Индекс здоровья системы</h2>
-                <div class="health-score-container">
-                    <div id="health-score" class="score-value">—</div>
-                    <span class="score-max">/ 100</span>
-                </div>
-                <div id="health-status" class="health-status" style="margin-bottom:20px;font-weight:600;color:var(--text-muted);">
-                    Ожидание подключения...
-                </div>
+          <!-- Schema -->
+          <div class="schema">
+            <div class="schema-node status-norm" id="node-power">
+              ⚡ Питание
+            </div>
+            <div class="schema-line"></div>
+            <div class="schema-node status-norm" id="node-engine">
+              ⚙️ Двигатель
+            </div>
+            <div class="schema-line"></div>
+            <div class="schema-node status-norm" id="node-brakes">
+              🛑 Тормоза
+            </div>
+          </div>
 
-                <div class="train-schema">
-                    <div class="schema-node status-norm" id="node-power">🔋 Питание</div>
-                    <div class="schema-line"></div>
-                    <div class="schema-node status-norm" id="node-engine">⚙️ Двигатель</div>
-                    <div class="schema-line"></div>
-                    <div class="schema-node status-norm" id="node-brakes">🛑 Тормоза</div>
-                </div>
+          <!-- Factors -->
+          <div id="factors-container" class="factors"></div>
+        </section>
 
-                <div class="health-breakdown" style="margin-top:25px;" id="factors-container"></div>
-            </section>
+        <!-- Alerts -->
+        <section class="card alerts-card">
+          <h2 class="card-title">Предупреждения</h2>
+          <div id="dynamic-alert" class="alert-card norm-state">
+            <span class="alert-icon">🔌</span>
+            <div class="alert-content">
+              <strong>Подключение к бэкенду...</strong>
+              <p class="alert-sub">Ожидание телеметрии</p>
+            </div>
+          </div>
 
-            <section class="glass-panel widget alerts-widget">
-                <h2>Система предупреждений</h2>
-                <div id="alerts-container" class="alerts-list">
-                    <div class="alert-card norm-state" id="dynamic-alert">
-                        <span class="alert-icon">🔌</span>
-                        <div class="alert-content">
-                            <strong style="font-size:1.05rem;color:var(--text-main);">Подключение к бэкенду...</strong>
-                            <p style="color:var(--text-muted);margin-top:4px;">Ожидание телеметрии от симулятора.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
+          <div class="history-section">
+            <h3 class="history-title">Журнал событий</h3>
+            <div id="alert-history" class="alert-history-list">
+              <p class="history-empty">Нет событий</p>
+            </div>
+          </div>
+        </section>
+
+        <div class="shortcut-hint"><kbd>Space</kbd> пауза / воспр.</div>
+      </aside>
+
+      <!-- RIGHT COLUMN -->
+      <div class="col-right">
+        <!-- Chart / Map -->
+        <section class="card chart-card">
+          <div class="chart-header">
+            <div class="tabs">
+              <button id="tab-trends" class="tab-btn active">📈 Тренды</button>
+              <button id="tab-map" class="tab-btn">🗺️ Карта</button>
+            </div>
+            <span class="live-indicator is-live" id="chart-live-badge"
+              >LIVE</span
+            >
+          </div>
+
+          <!-- Map controls (hidden by default) -->
+          <div id="map-controls" class="map-controls" style="display: none">
+            <span class="map-route-label">Маршрут:</span>
+            <select id="station-a" class="select">
+              <option value="astana">Астана</option>
+              <option value="almaty">Алматы</option>
+            </select>
+            <span class="map-arrow">→</span>
+            <select id="station-b" class="select">
+              <option value="karaganda" selected>Караганда</option>
+              <option value="pavlodar">Павлодар</option>
+            </select>
+          </div>
+
+          <div class="chart-area">
+            <div id="main-chart" style="width: 100%; height: 380px"></div>
+            <div
+              id="map-container"
+              style="
+                width: 100%;
+                height: 380px;
+                display: none;
+                border-radius: 8px;
+              "
+            ></div>
+          </div>
+
+          <!-- Replay controls -->
+          <div id="replay-panel" class="replay-bar">
+            <button
+              id="replay-btn"
+              class="icon-btn"
+              title="Воспроизвести последние 5 мин"
+            >
+              ⏪ −5 мин
+            </button>
+            <button
+              id="play-pause"
+              class="icon-btn"
+              title="Пауза / Воспроизведение (Space)"
+            >
+              ⏸ Pause
+            </button>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value="100"
+              class="timeline-slider"
+            />
+            <span id="timeline-status" class="timeline-label">LIVE</span>
+          </div>
+        </section>
+
+        <!-- Speed + Stat cards -->
+        <div class="stats-row">
+          <div class="card stat-card speed-card">
+            <span class="stat-label">Скорость</span>
+            <div class="speed-gauge-wrap">
+              <svg class="speed-gauge" viewBox="0 0 120 120">
+                <!-- Track arc: 270° from 135° to 45° -->
+                <path
+                  d="M 23.2 96.8 A 52 52 0 1 1 96.8 96.8"
+                  fill="none"
+                  stroke="var(--ring-track)"
+                  stroke-width="7"
+                  stroke-linecap="round"
+                />
+                <!-- Fill arc -->
+                <path
+                  id="speed-arc-fill"
+                  d="M 23.2 96.8 A 52 52 0 1 1 96.8 96.8"
+                  fill="none"
+                  stroke="var(--ktz-blue)"
+                  stroke-width="7"
+                  stroke-linecap="round"
+                  style="
+                    transition:
+                      stroke-dashoffset 0.4s ease,
+                      stroke 0.3s ease;
+                  "
+                />
+                <!-- Tick labels -->
+                <text x="20" y="108" class="gauge-tick">0</text>
+                <text x="8" y="42" class="gauge-tick">60</text>
+                <text x="54" y="16" class="gauge-tick">100</text>
+                <text x="100" y="42" class="gauge-tick">140</text>
+              </svg>
+              <div class="speed-gauge-center">
+                <span id="speed-num" class="speed-num">0</span>
+                <span class="speed-unit">км/ч</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card stat-card">
+            <div class="stat-top">
+              <span class="stat-label" id="pressure-label">Давление ТМ</span>
+              <span class="stat-trend trend-flat" id="pressure-trend">—</span>
+            </div>
+            <div class="stat-value">
+              <span class="stat-num" id="pressure-num">—</span>
+              <span class="stat-unit" id="pressure-unit">кгс/см²</span>
+            </div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-top">
+              <span class="stat-label" id="voltage-label">Напряжение КС</span>
+              <span class="stat-trend trend-flat" id="voltage-trend">—</span>
+            </div>
+            <div class="stat-value">
+              <span class="stat-num" id="voltage-num">—</span>
+              <span class="stat-unit" id="voltage-unit">кВ</span>
+            </div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-top">
+              <span class="stat-label" id="fuel-label">Остаток топлива</span>
+              <span class="stat-trend trend-flat" id="fuel-trend">—</span>
+            </div>
+            <div class="stat-value">
+              <span class="stat-num" id="fuel-num">—</span>
+              <span class="stat-unit" id="fuel-unit">л</span>
+            </div>
+            <span class="stat-context" id="fuel-context"></span>
+          </div>
         </div>
-
-        <div class="column right-col">
-
-            <section class="glass-panel widget chart-widget">
-                <div class="widget-header" style="border-bottom:1px solid var(--glass-border);padding-bottom:15px;margin-bottom:15px;">
-                    <div class="tabs-toggle" style="display:flex;gap:10px;">
-                        <button id="tab-trends" class="btn primary-btn">📈 Тренды</button>
-                        <button id="tab-map" class="btn outline-btn" style="color:var(--text-main);border-color:var(--glass-border);">🗺️ Карта маршрута</button>
-                    </div>
-                    <div class="live-indicator" id="chart-live-badge">LIVE</div>
-                </div>
-
-                <div id="map-controls" style="display:none;gap:15px;align-items:center;margin-bottom:15px;background:rgba(0,0,0,0.1);padding:10px;border-radius:8px;">
-                    <span style="font-size:0.85rem;color:var(--text-muted);">Маршрут:</span>
-                    <select id="station-a" class="glass-select">
-                        <option value="astana">Астана (Нурлы Жол)</option>
-                        <option value="almaty">Алматы</option>
-                    </select>
-                    <span style="color:var(--ktz-blue);">➡</span>
-                    <select id="station-b" class="glass-select">
-                        <option value="karaganda" selected>Караганда</option>
-                        <option value="pavlodar">Павлодар</option>
-                    </select>
-                    <span style="margin-left:auto;font-size:0.8rem;color:var(--status-norm);">GPS Signal: OK</span>
-                </div>
-
-                <div id="content-area" style="position:relative;">
-                    <div id="main-chart" style="width:100%;height:380px;"></div>
-                    <div id="map-container" style="width:100%;height:380px;display:none;border-radius:8px;"></div>
-                </div>
-
-                <div class="replay-controls" id="replay-panel" style="display:flex;gap:15px;align-items:center;margin-top:10px;padding-top:15px;border-top:1px solid var(--glass-border);">
-                    <button class="action-btn">⏪ -5m</button>
-                    <button class="action-btn" id="play-pause">⏸ Pause</button>
-                    <input type="range" min="0" max="100" value="100" class="timeline-slider" style="flex-grow:1;cursor:pointer;">
-                    <span id="timeline-status" style="font-size:0.9rem;color:var(--status-norm);font-weight:700;min-width:60px;text-align:right;">LIVE</span>
-                </div>
-            </section>
-
-            <section class="quick-stats-grid">
-                <div class="glass-panel stat-card">
-                    <span class="stat-label">Давление ТМ</span>
-                    <span class="stat-val tabular" id="pressure-val">— <small style="color:var(--text-muted);font-size:1rem;">кгс/см²</small></span>
-                </div>
-                <div class="glass-panel stat-card">
-                    <span class="stat-label">Напряжение сети</span>
-                    <span class="stat-val tabular" id="voltage-val">— <small style="color:var(--text-muted);font-size:1rem;">кВ</small></span>
-                </div>
-                <div class="glass-panel stat-card">
-                    <span class="stat-label">Остаток топлива</span>
-                    <span class="stat-val tabular" id="fuel-val">— <small style="color:var(--text-muted);font-size:1rem;">л</small></span>
-                    <span class="stat-context alert-text" style="font-size:0.85rem;margin-top:5px;color:var(--text-muted);"></span>
-                </div>
-            </section>
-
-        </div>
+      </div>
     </main>
 
-    <script src="app.js"></script>
-</body>
+    <script type="module" src="js/main.js"></script>
+  </body>
 </html>
